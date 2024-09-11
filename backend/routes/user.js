@@ -4,21 +4,10 @@ const router = express.Router();
 require("dotenv").config();
 const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
 
-const { z } = require("zod");
 const { signUp, signIn } = require("../dbHandler");
-const jwt = require('jsonwebtoken');
-
-const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(5),
-});
-
-const signUpSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(5),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-});
+const jwt = require("jsonwebtoken");
+const { signInSchema, signUpSchema } = require("../utils/zodSchemas");
+const { validateToken } = require("../utils/shared");
 
 router.post("/sign-in", async (req, res) => {
   try {
@@ -32,7 +21,7 @@ router.post("/sign-in", async (req, res) => {
     const signInStatus = await signIn({ email, password });
     if (signInStatus) {
       return res.json({
-        token: jwt.sign({email, password}, JWT_PRIVATE_KEY),
+        token: jwt.sign({ email, password }, JWT_PRIVATE_KEY),
         message: "Welcome back",
       });
     } else {
@@ -41,11 +30,16 @@ router.post("/sign-in", async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(">> err", err);
     return res.status(500).json({
       message: "Something went wrong, please try again",
     });
   }
+});
+
+router.get("/tokenTest", validateToken, (req, res) => {
+  return res.json({
+    message: "Good to go",
+  });
 });
 
 router.post("/sign-up", async (req, res) => {
