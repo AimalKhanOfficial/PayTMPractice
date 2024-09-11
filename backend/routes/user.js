@@ -1,7 +1,12 @@
 const express = require("express");
-const { z } = require("zod");
 const router = express.Router();
+
+require("dotenv").config();
+const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
+
+const { z } = require("zod");
 const { signUp, signIn } = require("../dbHandler");
+const jwt = require('jsonwebtoken');
 
 const signInSchema = z.object({
   email: z.string().email(),
@@ -27,6 +32,7 @@ router.post("/sign-in", async (req, res) => {
     const signInStatus = await signIn({ email, password });
     if (signInStatus) {
       return res.json({
+        token: jwt.sign({email, password}, JWT_PRIVATE_KEY),
         message: "Welcome back",
       });
     } else {
