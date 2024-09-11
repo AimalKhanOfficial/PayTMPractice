@@ -3,6 +3,7 @@ const basePath = "http://localhost:3000";
 
 export async function POST(req: Request) {
   const data = await req.json();
+  console.log('>> data', data)
   try {
     const response = await axios.post(`${basePath}/user/sign-in`, data, {
       headers: {
