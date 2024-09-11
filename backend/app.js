@@ -3,6 +3,8 @@ const admin = require("./routes/admin");
 const user = require("./routes/user");
 
 const app = express();
+app.use(express.json());
+
 const port = 3000;
 
 app.use("/admin", admin);
